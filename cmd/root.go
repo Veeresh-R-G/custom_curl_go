@@ -4,9 +4,12 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"log"
+	"net"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -25,34 +28,57 @@ to quickly create a Cobra application.`,
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 
+		fmt.Println("Sending Request ...")
+		time.Sleep(2500000000)
+
 		protocols := make(map[string]interface{})
 		protocols["GET"] = 1
 		protocols["POST"] = "yes"
 
 		if args[0] != "carlo" {
-			panic("Wrong Command Used")
+			log.Fatalln("Wrong Command Used")
 		}
 
 		if _, ok := protocols[args[1]]; !ok {
-			panic("Wrong Protocol Mentioned")
+			log.Fatalln("Wrong Protocol Mentioned")
 		}
-
+		method := args[1]
 		u, err := url.Parse(args[2])
 
 		if err != nil {
 			log.Fatalf("Error : %v\n", err)
-			os.Exit(0)
 		}
 
 		host := u.Hostname()
 		port := u.Port()
 		path := u.Path
+		// log.Printf("HostName = %v Port = %v Path = %v\n", host, port, path)
+
 		if port == "" {
 			port = "80"
 		}
 
-		log.Printf("HostName = %v Port = %v Path = %v\n", host, port, path)
+		conn, err := net.Dial("tcp", fmt.Sprintf("%s:%s", host, port))
 
+		fmt.Println("Request Sent ...")
+
+		if err != nil {
+			log.Fatalf("TCP Connection Error : %v", err)
+		}
+		defer conn.Close()
+
+		buff := make([]byte, 1024)
+		if method == "GET" {
+
+			fmt.Fprintf(conn, "%s %s HTTP/1.0\r\nHost: %s\r\n\r\n", method, path, host)
+			n, err := conn.Read(buff)
+			fmt.Println("Here")
+			if err != nil {
+				log.Fatalf("Buffer error : %s", err)
+			}
+
+			fmt.Printf("\nResponse : \n\n%s", string(buff[:n]))
+		}
 	},
 }
 
