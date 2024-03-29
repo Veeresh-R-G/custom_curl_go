@@ -6,4 +6,11 @@
 - Use curl ```go run main.go carlo <protocol-name> <url-name>```
 - Get your results on your terminal
 
+#### Pending Tasks
+- Should implement for HTTPS websites
+- Should implement for various other methods (POST / DELETE)
+
+
+Wanna Contribute ? Be my Guest 😎
+
 Inspired by : [Build your own cURL in Rust](https://dev.to/chaudharypraveen98/build-your-own-curl-rust-5cj6#:~:text=We%20are%20using%20the%20Builder%20pattern%20for%20our%20CLI%20tool.&text=Firstly%2C%20we%20have%20to%20define,one%20positional%20required%20argument%20url.)
