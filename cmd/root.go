@@ -4,7 +4,8 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
+	"log"
+	"net/url"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -26,7 +27,7 @@ to quickly create a Cobra application.`,
 
 		protocols := make(map[string]interface{})
 		protocols["GET"] = 1
-		protocols["POST"] = 1
+		protocols["POST"] = "yes"
 
 		if args[0] != "carlo" {
 			panic("Wrong Command Used")
@@ -36,7 +37,22 @@ to quickly create a Cobra application.`,
 			panic("Wrong Protocol Mentioned")
 		}
 
-		fmt.Printf("Command line args : %s", args)
+		u, err := url.Parse(args[2])
+
+		if err != nil {
+			log.Fatalf("Error : %v\n", err)
+			os.Exit(0)
+		}
+
+		host := u.Hostname()
+		port := u.Port()
+		path := u.Path
+		if port == "" {
+			port = "80"
+		}
+
+		log.Printf("HostName = %v Port = %v Path = %v\n", host, port, path)
+
 	},
 }
 
