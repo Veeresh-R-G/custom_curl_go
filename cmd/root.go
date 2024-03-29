@@ -34,6 +34,7 @@ to quickly create a Cobra application.`,
 		protocols := make(map[string]interface{})
 		protocols["GET"] = 1
 		protocols["POST"] = "yes"
+		protocols["DELETE"] = "yes"
 
 		if args[0] != "carlo" {
 			log.Fatalln("Wrong Command Used")
@@ -42,7 +43,9 @@ to quickly create a Cobra application.`,
 		if _, ok := protocols[args[1]]; !ok {
 			log.Fatalln("Wrong Protocol Mentioned")
 		}
+
 		method := args[1]
+
 		u, err := url.Parse(args[2])
 
 		if err != nil {
@@ -68,7 +71,7 @@ to quickly create a Cobra application.`,
 		defer conn.Close()
 
 		buff := make([]byte, 1024)
-		if method == "GET" {
+		if method == "GET" || method == "DELETE" {
 
 			fmt.Fprintf(conn, "%s %s HTTP/1.0\r\nHost: %s\r\n\r\n", method, path, host)
 			n, err := conn.Read(buff)
