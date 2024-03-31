@@ -4,11 +4,15 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+
+	// "json"
 	"log"
 	"net"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -81,6 +85,47 @@ to quickly create a Cobra application.`,
 			}
 
 			fmt.Printf("\nResponse : \n\n%s", string(buff[:n]))
+		} else {
+			//For POST Request
+			log.Printf("HostName = %v Port = %v Path = %v\n", host, port, path)
+			fmt.Println("POST request")
+			// Parse postData JSON string
+			var data map[string]interface{}
+			json.Unmarshal([]byte(postData), &data)
+			fmt.Println("POST Data:", data)
+
+			// Parse headers
+			headerMap := make(map[string]string)
+			for _, header := range headers {
+				parts := strings.SplitN(header, ":", 2)
+				if len(parts) != 2 {
+					fmt.Println("Invalid header format:", header)
+					continue
+				}
+				key := strings.TrimSpace(parts[0])
+				value := strings.TrimSpace(parts[1])
+				headerMap[key] = value
+			}
+			fmt.Println("Headers:", headerMap)
+
+			// Compose HTTP request
+			request := fmt.Sprintf("%s %s HTTP/1.0\r\nHost: %s\r\n", method, path, host)
+			for key, value := range headerMap {
+				request += fmt.Sprintf("%s: %s\r\n", key, value)
+			}
+			request += fmt.Sprintf("Content-Type: application/json\r\nContent-Length: %d\r\n\r\n%s", len(postData), postData)
+
+			// Send HTTP request
+			fmt.Fprintf(conn, request)
+
+			// Read response
+			n, err := conn.Read(buff)
+			if err != nil {
+				log.Fatalf("Buffer error : %s", err)
+			}
+
+			fmt.Printf("\nResponse : \n\n%s", string(buff[:n]))
+
 		}
 	},
 }
@@ -95,15 +140,7 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
+	//All Flags definition Over here
+	rootCmd.Flags().BoolP("curl_flag", "X", false, "Compulsory Flag")
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.custom_curl_go.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	rootCmd.Flags().BoolP("curl", "X", false, "This will trigger custom curl")
-	// rootCmd.Flags().Bool("X", true, "This will trigger custom curl")
 }
