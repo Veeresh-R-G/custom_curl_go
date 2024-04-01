@@ -8,7 +8,6 @@
 
 #### Pending Tasks
 - Should implement for HTTPS websites
-- Should implement for various other methods (POST / DELETE)
 
 
 Wanna Contribute ? Be my Guest 😎
